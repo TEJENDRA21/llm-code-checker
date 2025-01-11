@@ -8,7 +8,10 @@ WORKDIR /app
 COPY . /app
 
 # Install required Python packages
-RUN pip install --no-cache-dir openai requests
+RUN pip install --no-cache-dir openai flask requests
+
+# Expose port 5000 for Flask
+EXPOSE 5000
 
 # Define the command to run the script
 CMD ["python", "check_code.py"]
