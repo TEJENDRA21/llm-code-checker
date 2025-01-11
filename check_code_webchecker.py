@@ -13,7 +13,7 @@ def check_code_with_llm(code):
     """Check the code using an LLM."""
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "system",
