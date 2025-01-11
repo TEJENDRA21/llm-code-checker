@@ -1,10 +1,13 @@
 import os
+from flask import Flask, request, render_template_string
 from openai import OpenAI
 
 # Initialize the OpenAI client
 client = OpenAI(
     api_key=os.getenv("OPENAI_API_KEY")  # Fetch API key from environment variable
 )
+
+app = Flask(__name__)
 
 def check_code_with_llm(code):
     """Check the code using an LLM."""
@@ -28,15 +31,34 @@ def check_code_with_llm(code):
     except Exception as e:
         return f"An error occurred: {e}"
 
-def main():
-    # Example code to check
-    code = """
-    def example_function():
-        # TODO: Implement this function
-        pass
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    result = None
+    if request.method == 'POST':
+        code = request.form.get('code')
+        if code:
+            result = check_code_with_llm(code)
+
+    html_template = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>LLM Code Checker</title>
+    </head>
+    <body>
+        <h1>LLM Code Checker</h1>
+        <form method="POST">
+            <textarea name="code" rows="10" cols="80" placeholder="Paste your Python code here"></textarea><br>
+            <button type="submit">Check Code</button>
+        </form>
+        {% if result %}
+            <h2>LLM Check Result:</h2>
+            <pre>{{ result }}</pre>
+        {% endif %}
+    </body>
+    </html>
     """
-    result = check_code_with_llm(code)
-    print(f"LLM Check Result:\n{result}")
+    return render_template_string(html_template, result=result)
 
 if __name__ == "__main__":
-    main()
+    app.run(host="0.0.0.0", port=5000)
